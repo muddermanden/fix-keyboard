@@ -1,0 +1,8 @@
+#!/bin/bash
+WELCOME="Use this script to install packages needed to support international characters and keyboard layouts
+Select which packages to install.";
+YOUMUSTBEROOT="You must run this script as root";
+YOURCHOICE="Your choice";
+ERROR="Error";
+SPECIFYPACKAGES="You need to specify the packages to install";
+ALL="All";

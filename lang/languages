@@ -1,0 +1,2 @@
+#!/bin/bash
+declare -a LANGUAGES=('da-dk' 'en-uk');

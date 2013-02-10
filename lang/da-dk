@@ -1,0 +1,8 @@
+#!/bin/bash
+WELCOME="Brug dette script til at installere de pakker der er krævet for at understøtte internationale tegn og tastat
+Vælg pakker der skal installeres.";
+YOUMUSTBEROOT="Du skal være logget ind som brugerenroot";
+YOURCHOICE="Dit valg";
+ERROR="Fejl";
+SPECIFYPACKAGES="Vælg de pakker der skal intalleres.";
+ALL="Alle";

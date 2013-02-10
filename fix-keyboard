@@ -1,0 +1,109 @@
+#!/bin/bash
+#########################################################################################
+# @date:	2012-02-09								#
+# @author:	Morten Henrichsen (github@mhex.dk)					#
+# @purpose:	This script installs the packages required to use international		#
+#		keyboard layouts and characters with Xbian, an OS for Raspberry Pi	#
+#		with focus on delivery of a fast and stable XBMC media center.		#
+#########################################################################################
+BASEDIR=$(dirname $0);
+source "$BASEDIR/lang/languages";
+LANGUAGE="da-dk";	# da-dk en-uk
+source "$BASEDIR/lang/$LANGUAGE";
+
+if [ `id -u` -ne  0 ]; then
+	echo "$YOUMUSTBEROOT";
+	exit 1;
+fi
+
+#################################
+# SCRIPT VARIABLES		#
+#################################
+#echo ${LANGUAGES[@]};
+
+DEBUG=1;	# Set to 1 for debugging
+PACKAGES="locales console-setup keyboard-configuration $ALL";
+MAXHOURSSINCEUPDATE=24;	# Set this to 0 to perform an update everytime
+
+if [ $DEBUG -eq 1 ]; then
+	ARGS="-s -V";
+fi
+
+#################################
+# FUNCTIONS			#
+#################################
+
+function main {
+	echo -e "$WELCOME\n";
+	selectPackages; 
+}
+
+function selectPackages {
+	PS3="$YOURCHOICE: ";
+	select package in $PACKAGES;
+	do
+		installpkg $package;
+		break;
+	done
+}
+
+# Returns:
+#	  1: Update is required
+#	  0: No need to update
+# Change MAXHOURSSINCEUPDATE to specify how long to concider updates as recent.
+function checkLastUpdate {
+	if [ -f /var/lib/apt/periodic/update-success-stamp ]; then
+		timestamp=`stat -c %Y /var/lib/apt/periodic/update-success-stamp`;
+		now=`date +%s`;
+		if [ $((now - timestamp)) -gt $((60*60*$MAXHOURSSINCEUPDATE)) ]; then
+			return 0;
+		else
+			return 1;
+		fi
+	else
+		echo "APT::Update::Post-Invoke-Success {\"touch /var/lib/apt/periodic/update-success-stamp 2>/dev/null || true\";};">/etc/apt/apt.conf.d/15update-stamp
+	fi
+}
+
+function aptUpdate {
+	if checkLastUpdate; then
+		apt-get update $ARGS;
+	fi
+}
+
+function aptUpgrade {
+	apt-get upgrade -y $ARGS;
+}
+
+function err {
+	echo "$ERROR: $*" >&2;
+}
+
+function installpkg {
+	aptUpdate
+	aptUpgrade
+	if [ $# -eq 0 ]; then
+		err $SPECIFYPACKAGES;
+		selectPackages;
+	elif [ $1  == $ALL ]; then
+		for package in ${PACKAGES%$ALL}
+		do
+			apt-get install $package  -y $ARGS
+		done
+	else
+		apt-get install $1 -y $ARGS;
+	fi
+}
+
+
+#################################
+# RECONFIGURE PACKAGES		#
+#################################
+
+#for pkg in $PACKAGES
+#do
+#	dpkg-reconfigure $pkg;
+#done
+
+main
+exit 0;
