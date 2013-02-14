@@ -26,7 +26,7 @@ PACKAGES="locales console-setup keyboard-configuration $ALL";
 MAXHOURSSINCEUPDATE=24;	# Set this to 0 to perform an update everytime
 
 if [ $DEBUG -eq 1 ]; then
-	ARGS="-s -V";
+	ARGS="-sV";
 fi
 
 #################################
